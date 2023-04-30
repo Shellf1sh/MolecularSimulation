@@ -108,10 +108,6 @@ int main(){
             write_output << trajectories[i][j] << ",";
         }
         write_output << "\n";
-
-        /*write_output << trajectories[i][0] << "," << trajectories[i][1] << "," << trajectories[i][2] << "," << trajectories[i][3] 
-        << "," << trajectories[i][4] << "," << trajectories[i][5] << "," << trajectories[i][6] <<
-        "," << trajectories[i][7] << "," << trajectories[i][8] << "," << trajectories[i][9] <<"\n";*/
     }
     write_output.close();
 
