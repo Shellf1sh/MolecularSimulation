@@ -7,6 +7,7 @@ class Dumbbell{
     public: 
         double m, k, delta_t, energy; //When creating an instance of this class remember to define these variables
         double angular_momentum[6] = {0, 0, 0, 0, 0, 0};
+        bool FENE = false;
         
         double r[6] = {0, 0, 0, 0, 0, 0}; //The elements are [x1, y1, z1, x2, y2, z2]
         double p[6] = {0, 0, 0, 0, 0, 0}; //The elements are [px1, py1, pz1, px2, py2, pz2]
@@ -32,17 +33,28 @@ class Dumbbell{
         }
 
         void calculateForce(){
-            for(int i = 0; i < 3; i++){
-                F[i] = -k*(r[i] - r[i+3]);
-                F[i+3] = k*(r[i] - r[i+3]);
+            if(!FENE){
+                for(int i = 0; i < 3; i++){
+                    F[i] = -k*(r[i] - r[i+3]);
+                    F[i+3] = k*(r[i] - r[i+3]);          
+                }
+            }else{
+                for(int i = 0; i < 3; i++){
+                    F[i] = k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));
+                    F[i+3] = -k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));      
+                }
             }
         }
 
         void updateEnergy(){
             double kinetic_energy = (p[0]*p[0]+p[1]*p[1]+p[2]*p[2]+p[3]*p[3]+p[4]*p[4]+p[5]*p[5])/m;
-            double potnetial_energy = 0.5*k*((r[0]-r[3])*(r[0]-r[3]) + (r[1]-r[4])*(r[1]-r[4]) + (r[2]-r[5])*(r[2]-r[5]));
-
-            energy = kinetic_energy + potnetial_energy;
+            double potential_energy;
+            if(!FENE){
+                potential_energy = 0.5*k*((r[0]-r[3])*(r[0]-r[3]) + (r[1]-r[4])*(r[1]-r[4]) + (r[2]-r[5])*(r[2]-r[5]));
+            }else{
+                potential_energy = -0.5*k*log(1-((r[0]-r[3])*(r[0]-r[3]) + (r[1]-r[4])*(r[1]-r[4]) + (r[2]-r[5])*(r[2]-r[5])));
+            }
+            energy = kinetic_energy + potential_energy;
         }
 
         void updateAngularMomentum(){
