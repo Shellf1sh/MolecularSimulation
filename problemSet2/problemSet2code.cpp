@@ -42,8 +42,8 @@ class Dumbbell{
                 }
             }else{
                 for(int i = 0; i < 3; i++){
-                    F[i] = k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));
-                    F[i+3] = -k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));      
+                    F[i] = -k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));
+                    F[i+3] = k*(r[i] - r[i+3])/(2.0*(1.0-abs(r[i]-r[i+3])*abs(r[i]-r[i+3])));      
                 }
             }
         }
@@ -125,9 +125,11 @@ int main(){
     dumbbell.k = 0.4;
     dumbbell.delta_t = 1e-2 * sqrt(dumbbell.m*dumbbell.k);
 
+    double factor = 0.4;
+
     double initPosition[6] = {1.0/3.0, 0.0, 0.0, -1.0/3.0, 0.0, 0.0}; //Setting initial conditions
-    double initMomentum[6] = {-6.0/7.0*sqrt(dumbbell.m*dumbbell.k), 3.0/7.0*sqrt(dumbbell.m*dumbbell.k), -2.0/7.0*sqrt(dumbbell.m*dumbbell.k), 
-                                6.0/7.0*sqrt(dumbbell.m*dumbbell.k), -3.0/7.0*sqrt(dumbbell.m*dumbbell.k), 2.0/7.0*sqrt(dumbbell.m*dumbbell.k)};
+    double initMomentum[6] = {-6.0/7.0*sqrt(dumbbell.m*dumbbell.k) *factor, 3.0/7.0*sqrt(dumbbell.m*dumbbell.k) *factor, -2.0/7.0*sqrt(dumbbell.m*dumbbell.k ) *factor, 
+                                6.0/7.0*sqrt(dumbbell.m*dumbbell.k) *factor, -3.0/7.0*sqrt(dumbbell.m*dumbbell.k) *factor, 2.0/7.0*sqrt(dumbbell.m*dumbbell.k) *factor};
     dumbbell.setInitialConditions(initPosition, initMomentum);
 
     int T = 10*sqrt(dumbbell.m/dumbbell.k);
@@ -179,24 +181,28 @@ int main(){
     dumbbell_FENE.k = 0.4;
 
     dumbbell_FENE.delta_t = 1e-2 * sqrt(dumbbell_FENE.m*dumbbell_FENE.k);
+
+    int N_FENE = T/dumbbell_FENE.delta_t;
+
     dumbbell_FENE.setInitialConditions(initPosition, initMomentum);
     dumbbell_FENE.calculateForce(); //Initial force calculation
-    double trajectories_FENE[N][17]; 
-    runSimulation(trajectories_FENE, dumbbell_FENE, N);
-    create_csv(trajectories_FENE, "trajectory_FENE.csv", 17, N);
+    double trajectories_FENE[N_FENE][17]; 
+    runSimulation(trajectories_FENE, dumbbell_FENE, N_FENE);
+    create_csv(trajectories_FENE, "trajectory_FENE.csv", 17, N_FENE);
 
     std::cout << "First FENE simulation done. \n";
 
-
+    //We redefine the time step so we can run the simulation again
     dumbbell_FENE.delta_t = 4 * 1e-2 * sqrt(dumbbell_FENE.m*dumbbell_FENE.k); //Rerun but with the big delta t
     dumbbell_FENE.setInitialConditions(initPosition, initMomentum);
     dumbbell_FENE.calculateForce(); //Initial force calculation
-    double trajectories_FENE_big[N][17]; 
+    double trajectories_FENE_big[N_big_step][17]; 
     runSimulation(trajectories_FENE_big, dumbbell_FENE, N_big_step);
-    create_csv(trajectories_FENE_big, "trajectory_FENE_big.csv", 17, N);
+    create_csv(trajectories_FENE_big, "trajectory_FENE_big.csv", 17, N_big_step);
 
     std::cout << "Big step FENE simulation done. \n";
 
+    std::cout << N << " and " << N_big_step << " \n";
 
     std::cout << "Done" << std::endl;
     return 0;
