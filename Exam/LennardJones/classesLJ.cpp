@@ -247,3 +247,44 @@ double VerletSimulation::getPotentialEnergy(){
     return Epot;
 }
 
+double VerletSimulation::getVirial(){
+    double virial = 0;
+
+    for(int i = 0; i < N; i++){
+        virial += beads[i].x*beads[i].fx + beads[i].y*beads[i].fy + beads[i].z*beads[i].fz;
+    }
+    return virial;
+}
+
+
+double VerletSimulation::getChemicalPotential(int n_test){
+
+    double total_exp = 0;
+
+
+    for(int i = 0; i < n_test; i++){
+        double deltaU = 0;
+
+        double x = normal(generator_normal)*L - L/2;
+        double y = normal(generator_normal)*L - L/2;
+        double z = normal(generator_normal)*L - L/2;
+
+        for(int j = 0; j < N; j++){
+            double dx = x - beads[j].x;
+            double dy = y - beads[j].y;
+            double dz = z - beads[j].z;
+
+            dx = boundary(dx, L);
+            dy = boundary(dy, L);
+            dz = boundary(dz, L);
+
+            double distance = std::sqrt(dx*dx + dy*dy + dz*dz);
+            double singlePot = LJ_potential(distance, epsilon, sigma);
+
+            deltaU += singlePot;
+        }
+
+        total_exp += std::exp(-deltaU/kT);
+    }
+    return total_exp/n_test;
+}

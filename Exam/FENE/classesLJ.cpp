@@ -1,5 +1,6 @@
 #include<iostream>
 #include<iomanip>
+#include<cstdlib>
 #include<cmath>
 #include<ctime>
 #include<random>
@@ -18,31 +19,35 @@ VerletSimulation::VerletSimulation(int N,double n_steps, double m, double dt, do
         beads.resize(N);
     }
 
-void VerletSimulation::initialize() {
+void VerletSimulation::initialize(bool loop) {
     for(int i = 0; i < N; i++){
         beads[i].px = MaxwellBoltzmann(kT, m);
         beads[i].py = MaxwellBoltzmann(kT, m);
         beads[i].pz = MaxwellBoltzmann(kT, m);
     }
-
     for(int i = 0; i < N; i++){
-        beads[i].x = i*rMax/2 - L/2;
+        beads[i].x = i*0.1;
         beads[i].y = 0;
         beads[i].z = 0;
+    }
+    if(loop){
+        for(int i = 0; i < N; i++){
+            beads[i].x = i*rMax/3;
+        }
     }
 }
 
 
 void VerletSimulation::testInit(){
-    beads[0].x = -0.2;
+    beads[0].x = -0.3;
     beads[0].y = 0;
     beads[0].z = 0;
-    beads[1].x = 0.2;
+    beads[1].x = 0.3;
     beads[1].y = 0;
     beads[1].z = 0;
 
     beads[0].px = 0;
-    beads[0].py = 0.5;
+    beads[0].py = 0;
     beads[0].pz = 0;
     beads[1].px = 0;
     beads[1].py = 0;
@@ -74,8 +79,9 @@ void VerletSimulation::backintotheBox() {
     for (int i = 0; i < N; ++i) {
         beads[i].x = boundary(beads[i].x, L);
         beads[i].y = boundary(beads[i].y, L);
-        beads[i].z = boundary(beads[i].z, L);
+        beads[i].z = boundary(beads[i].z, L); 
     }
+
 }
 
 double VerletSimulation::FENEForce(double deltar){
@@ -113,9 +119,9 @@ void VerletSimulation::computeForces() {
         double distance = sqrt(rx*rx+ry*ry+rz*rz);
         double total_force = FENEForce(distance);
 
-        fx = abs(total_force)*rx/distance; 
-        fy = abs(total_force)*ry/distance; 
-        fz = abs(total_force)*rz/distance; 
+        fx = fabs(total_force)*rx/distance; 
+        fy = fabs(total_force)*ry/distance; 
+        fz = fabs(total_force)*rz/distance; 
 
         //Maybe a sign needs to be switched
         beads[i].fx += -fx;
@@ -125,6 +131,8 @@ void VerletSimulation::computeForces() {
         beads[i+1].fx += fx;
         beads[i+1].fy += fy;
         beads[i+1].fz += fz;  
+
+        //std::cout <<"Force on bead " << beads[i].fx << " and " << beads[i+1].fx << std::endl; 
     }
     if(loop){
         fx = 0.0;
@@ -143,9 +151,9 @@ void VerletSimulation::computeForces() {
         double distance = sqrt(rx*rx+ry*ry+rz*rz);
         double total_force = FENEForce(distance);
 
-        fx = abs(total_force)*rx/distance; 
-        fy = abs(total_force)*ry/distance; 
-        fz = abs(total_force)*rz/distance; 
+        fx = -abs(total_force)*rx/distance; 
+        fy = -abs(total_force)*ry/distance; 
+        fz = -abs(total_force)*rz/distance; 
 
         //Maybe a sign needs to be switched
         beads[N-1].fx += fx;

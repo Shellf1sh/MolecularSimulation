@@ -5,7 +5,7 @@
 
 
 int main(){
-    const int N = 4;
+    const int N = 48;
     const bool periodic = false;
 
     const double m = 1;
@@ -14,13 +14,17 @@ int main(){
     
     const double kT = 0.1*K*rMax*rMax;
     const double sigma = 1;
-    const double gamma = 0;// 0.2*sqrt(K/m);
-    const double tau = 1;///gamma;
+    const double gamma = 0.2*sqrt(K/m);
+    const double tau = 1/gamma;
     const double dt = 0.001*tau;
-    const int n_steps = 10*tau/dt;
-    const double L = N*rMax;
+    const int n_steps = 200*tau/dt;
 
-    bool HamiltonianDyn = true;
+    double L = N*rMax;
+    if(periodic){
+        L = N*rMax/3;
+    }
+
+    bool HamiltonianDyn = false; // If true then no random influence
     const int ThermostatCutOff = 0;
 
     const int saveSteps = 10;
@@ -36,23 +40,20 @@ int main(){
     }
 
     VerletSimulation simulation(N, n_steps, m, dt, L, gamma, kT, rMax, K, periodic);
-    simulation.initialize();
+    simulation.initialize(periodic);
     //simulation.testInit();
 
 
     double **data = new double *[n_steps/saveSteps];
     for (int i = 0; i < n_steps/saveSteps; i++){
-        data[i] = new double[N * 3 + N * 3 + 1 + 2 ];//Position, momenta, Ekin, Epot, time   
+        data[i] = new double[N * 3 + N * 3 + 3 ];//Position, momenta, Ekin, Epot, time   
     }
 
     for (int i = 0; i < n_steps; i++) {
-            
-        HamiltonianDyn = i > ThermostatCutOff;
 
         simulation.VerletStep(HamiltonianDyn);  // Perform a single Verlet step
         
         if(i%saveSteps == 0){
-            
 
             double* posAndMom = simulation.getPositionsAndMomenta();
 

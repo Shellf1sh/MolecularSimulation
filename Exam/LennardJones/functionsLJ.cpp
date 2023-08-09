@@ -48,3 +48,29 @@ double boundary(double distance, double size){
     }
     return distance;
 }
+
+double random_number(double L){
+    //std::seed_seq seed{std::time(nullptr)};
+
+    //std::default_random_engine generator(seed);
+    std::uniform_real_distribution<double> uniform(-L/2, L/2);
+    return uniform(generator);
+
+}
+
+double calculateDistance(double x1, double y1, double z1, double x2, double y2, double z2, double L) {
+    double dx = x1 - x2;
+    double dy = y1 - y2;
+    double dz = z1 - z2;
+
+    dx = boundary(dx, L);
+    dy = boundary(dy, L);
+    dz = boundary(dz, L);
+
+    double distance = std::sqrt(dx*dx + dy*dy + dz*dz);
+    return distance;
+}
+
+double LJ_potential(double deltar, double epsilon, double sigma){
+    return 4*epsilon*(std::pow(sigma/deltar, 12) - std::pow(sigma/deltar, 6));
+}

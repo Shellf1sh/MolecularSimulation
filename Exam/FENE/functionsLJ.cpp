@@ -28,7 +28,7 @@ void create_csv(double** data, std::string name, int rows, int columns){
     std::cout << "CSV created: " << name << std::endl;
 }
 
-std::seed_seq seed1{std::time(nullptr)};
+std::seed_seq seed1{10};
 std::default_random_engine generator(seed1);
 
 double MaxwellBoltzmann(double kT, double mass){
@@ -46,5 +46,6 @@ double boundary(double distance, double size){
     }else if(distance < -size/2){
         distance += size;
     }
+    //std::cout << "Size: " << size << std::endl; 
     return distance;
 }

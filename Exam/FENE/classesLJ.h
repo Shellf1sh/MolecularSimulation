@@ -20,7 +20,7 @@ class VerletSimulation{
         const double n_steps;
         const double m;
         const double dt;
-        const double L;
+        double L;
         const double gamma;
         const double kT;
         const double rMax;
@@ -28,7 +28,7 @@ class VerletSimulation{
         const bool loop;
 
     public:
-        void initialize();
+        void initialize(bool loop);
                 
         void VerletStep(bool hamil);
 

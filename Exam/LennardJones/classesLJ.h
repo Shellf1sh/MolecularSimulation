@@ -41,6 +41,10 @@ class VerletSimulation{
 
         double* getForces();
 
+        double getVirial();
+
+        double getChemicalPotential(int n_test);
+
         void testInit();
     
     private:
